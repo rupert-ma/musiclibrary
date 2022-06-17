@@ -1,3 +1,4 @@
+from functools import partial
 from django.http import Http404
 from django.shortcuts import render
 from .models import Song
@@ -44,6 +45,15 @@ class SongsDetail(APIView):
         song = self.get_object(pk)
         song.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def patch(self, request, pk):
+        song = self.get_object(pk)
+        song.likes = song.likes + 1
+        serializer = SongSerializer(song, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 # Self discussion for understanding
